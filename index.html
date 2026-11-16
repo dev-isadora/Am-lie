@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Amélie: seu caderno de estudos inteligente.">
-<meta name="theme-color" content="#fbeef3">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23f7b8cf%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23d9c2f4%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2246%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2Cserif%22%20font-style%3D%22italic%22%20font-size%3D%2240%22%20fill%3D%22%23c2457e%22%3EA%3C%2Ftext%3E%3C%2Fsvg%3E">
+<meta name="theme-color" content="#fdf2f0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23f8c6d2%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23dcebd6%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2246%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2Cserif%22%20font-style%3D%22italic%22%20font-size%3D%2240%22%20fill%3D%22%23c4577a%22%3EA%3C%2Ftext%3E%3C%2Fsvg%3E">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -15,45 +15,48 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
 <style>
-/* Layout: aura de fundo fixa em tons de rosa/lilás; conteúdo em painéis de vidro sobre ela; abas de vidro fixas no topo. */
+/* Layout: jardim rosé — aura de fundo em rosa, pêssego, sálvia e lavanda; papel de livro-razão com símbolos matemáticos e flores por cima; conteúdo em painéis de vidro. */
 :root{
-  --bg:#fbeef3;
-  --aura1:#f7b8cf; --aura2:#d9c2f4; --aura3:#ffd6c4; --aura4:#f9cde6;
-  --ink:#3d2340; --ink-soft:#7a5a7c; --ink-faint:#a88ca9;
-  --accent:#c2457e; --accent-ink:#ffffff; --accent-soft:#f6d3e3;
-  --plum:#7b4fa8;
-  --glass:rgba(255,255,255,.46); --glass-strong:rgba(255,255,255,.66);
-  --glass-line:rgba(255,255,255,.75); --glass-shadow:rgba(140,60,110,.13);
-  --hair:rgba(120,60,110,.14);
-  --good:#2f8f6b; --warn:#c07a12; --bad:#c03a4c;
-  --texture:rgba(120,48,98,.2);
+  --bg:#fdf2f0;
+  --aura1:#f8c6d2; --aura2:#fcdcc8; --aura3:#dcebd6; --aura4:#ead9f3;
+  --ink:#4b2733; --ink-soft:#87616d; --ink-faint:#b89aa4;
+  --accent:#c4577a; --accent-ink:#ffffff; --accent-soft:#f8dbe3;
+  --leaf:#7fa27b;
+  --glass:rgba(255,255,255,.5); --glass-strong:rgba(255,255,255,.7);
+  --glass-line:rgba(255,255,255,.8); --glass-shadow:rgba(150,70,90,.13);
+  --hair:rgba(130,60,80,.13);
+  --good:#3f8a5c; --warn:#b9781a; --bad:#c03a4c;
+  --texture:rgba(125,55,80,.17);
+  --flores:var(--flores-claro); --flores-op:.8; --ramo:var(--ramo-claro);
   --f-display:"Fraunces", "Iowan Old Style", Georgia, serif;
   --f-body:"DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#1e1220;
-  --aura1:#6e2350; --aura2:#3f2a6b; --aura3:#5a2a3a; --aura4:#4b1f4f;
-  --ink:#f8e6f1; --ink-soft:#d1b2cb; --ink-faint:#9a7f98;
-  --accent:#f07db0; --accent-ink:#2a0f1f; --accent-soft:#5a2546;
-  --plum:#c7a3f0;
-  --glass:rgba(60,28,58,.42); --glass-strong:rgba(70,34,68,.66);
-  --glass-line:rgba(255,200,235,.16); --glass-shadow:rgba(0,0,0,.35);
-  --hair:rgba(255,200,235,.13);
-  --good:#6fd3a8; --warn:#f2b45a; --bad:#ff8a9a;
-  --texture:rgba(255,196,232,.13);
+  --bg:#21151a;
+  --aura1:#6a2a40; --aura2:#5c3a2c; --aura3:#2f4a36; --aura4:#47305c;
+  --ink:#fbe9ee; --ink-soft:#d6b5bf; --ink-faint:#9c7f88;
+  --accent:#f3a1ba; --accent-ink:#2b0f19; --accent-soft:#5e2a3c;
+  --leaf:#a9c9a3;
+  --glass:rgba(58,30,40,.45); --glass-strong:rgba(70,36,48,.68);
+  --glass-line:rgba(255,210,225,.16); --glass-shadow:rgba(0,0,0,.35);
+  --hair:rgba(255,210,225,.12);
+  --good:#7fd0a0; --warn:#f2b45a; --bad:#ff8a9a;
+  --texture:rgba(255,205,222,.12);
+  --flores:var(--flores-escuro); --flores-op:.5; --ramo:var(--ramo-escuro);
   color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#1e1220;
-  --aura1:#6e2350; --aura2:#3f2a6b; --aura3:#5a2a3a; --aura4:#4b1f4f;
-  --ink:#f8e6f1; --ink-soft:#d1b2cb; --ink-faint:#9a7f98;
-  --accent:#f07db0; --accent-ink:#2a0f1f; --accent-soft:#5a2546;
-  --plum:#c7a3f0;
-  --glass:rgba(60,28,58,.42); --glass-strong:rgba(70,34,68,.66);
-  --glass-line:rgba(255,200,235,.16); --glass-shadow:rgba(0,0,0,.35);
-  --hair:rgba(255,200,235,.13);
-  --good:#6fd3a8; --warn:#f2b45a; --bad:#ff8a9a;
-  --texture:rgba(255,196,232,.13);
+  --bg:#21151a;
+  --aura1:#6a2a40; --aura2:#5c3a2c; --aura3:#2f4a36; --aura4:#47305c;
+  --ink:#fbe9ee; --ink-soft:#d6b5bf; --ink-faint:#9c7f88;
+  --accent:#f3a1ba; --accent-ink:#2b0f19; --accent-soft:#5e2a3c;
+  --leaf:#a9c9a3;
+  --glass:rgba(58,30,40,.45); --glass-strong:rgba(70,36,48,.68);
+  --glass-line:rgba(255,210,225,.16); --glass-shadow:rgba(0,0,0,.35);
+  --hair:rgba(255,210,225,.12);
+  --good:#7fd0a0; --warn:#f2b45a; --bad:#ff8a9a;
+  --texture:rgba(255,205,222,.12);
+  --flores:var(--flores-escuro); --flores-op:.5; --ramo:var(--ramo-escuro);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -65,6 +68,15 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .aura i:nth-child(3){width:40vmax;height:40vmax;left:18vmax;bottom:-20vmax;background:var(--aura3);animation-duration:38s}
 .aura i:nth-child(4){width:26vmax;height:26vmax;right:12vmax;bottom:6vmax;background:var(--aura4);animation-duration:22s}
 .aura .texture{position:absolute;inset:0;background:var(--texture);-webkit-mask-size:280px 280px;mask-size:280px 280px;-webkit-mask-repeat:repeat;mask-repeat:repeat}
+.aura .flores{position:absolute;inset:0;background-image:var(--flores);background-size:380px 380px;opacity:var(--flores-op)}
+.hero-c,.empty{position:relative;overflow:hidden}
+.hero-c::before,.empty::before{content:"";position:absolute;right:-12px;bottom:-14px;width:150px;height:112px;background:var(--ramo) right bottom/contain no-repeat;pointer-events:none;opacity:.9}
+.hero-c>*,.empty>*{position:relative}
+.empty::before{right:auto;left:-20px;transform:scaleX(-1)}
+.hero-c .countdown{padding-right:110px}
+@media (max-width:600px){.hero-c .countdown{padding-right:0;text-align:left}.hero-c::before{opacity:.45}}
+.flor-t{display:inline-block;width:.62em;height:.62em;margin-left:.12em;vertical-align:.45em;background:var(--accent);-webkit-mask:var(--flor-mask) center/contain no-repeat;mask:var(--flor-mask) center/contain no-repeat}
+nav.tabs button[aria-selected="true"]::before{content:"";display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;background:var(--accent);-webkit-mask:var(--flor-mask) center/contain no-repeat;mask:var(--flor-mask) center/contain no-repeat}
 .switch{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .switch select{width:auto;max-width:240px;font-weight:600;padding:7px 10px;background:var(--glass-strong);border-color:var(--glass-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .top-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
@@ -104,7 +116,7 @@ section.view{display:flex;flex-direction:column;gap:18px}
 .stat .num small{font-family:var(--f-body);font-size:14px;color:var(--ink-soft);margin-left:3px}
 .stat .hint{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
 .meter{height:7px;border-radius:9px;background:var(--hair);overflow:hidden;margin-top:10px}
-.meter i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--plum),var(--accent))}
+.meter i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--leaf),var(--accent))}
 
 .hero-c{padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
 .hero-c h2{font-family:var(--f-display);font-weight:400;font-size:clamp(22px,3.4vw,30px);margin:2px 0 0;line-height:1.15;text-wrap:balance}
@@ -132,7 +144,7 @@ textarea{resize:vertical;min-height:70px}
 .list{display:flex;flex-direction:column;gap:2px}
 .li{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--hair);min-width:0}
 .li:last-child{border-bottom:0}
-.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.dot{width:16px;height:16px;flex:none;-webkit-mask:var(--flor-mask) center/contain no-repeat;mask:var(--flor-mask) center/contain no-repeat}
 .li .t{flex:1;min-width:0}
 .li .t b{font-weight:600;display:block;overflow-wrap:anywhere}
 .li .t span{font-size:12.5px;color:var(--ink-soft)}
@@ -191,12 +203,12 @@ details.more summary::-webkit-details-marker{display:none}
 .tnum{font-variant-numeric:tabular-nums}
 </style>
 
-<div class="aura" aria-hidden="true"><i></i><i></i><i></i><i></i><div class="texture" id="texture"></div></div>
+<div class="aura" aria-hidden="true"><i></i><i></i><i></i><i></i><div class="texture" id="texture"></div><div class="flores"></div></div>
 
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1><em>Amélie</em></h1>
+      <h1><em>Amélie</em><span class="flor-t" aria-hidden="true"></span></h1>
       <p id="subtitle">Seu caderno de estudos inteligente.</p>
     </div>
     <div class="top-right">
@@ -234,7 +246,7 @@ const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
 const fmtH = min => { const h = Math.floor(min/60), m = Math.round(min%60); return h ? (m ? h+"h"+pad(m) : h+"h") : m+"min"; };
 const fmtDate = s => parse(s).toLocaleDateString("pt-BR",{day:"2-digit",month:"short"});
 const DIAS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-const CORES = ["#c2457e","#7b4fa8","#e07a5f","#3a8f8a","#d4a017","#5b7fd6","#b5539c","#4f9a62","#d96f9b","#8a6bd1"];
+const CORES = ["#c4577a","#7fa27b","#e0896a","#9b7cc4","#d9a441","#5f9ea0","#d77fa1","#6f8fc9","#b5536b","#a3b86c"];
 const REV = [1, 7, 30]; // revisões espaçadas: 1, 7 e 30 dias depois
 
 /* ---------- textura: papel de livro-razão com símbolos de matemática e contabilidade ---------- */
@@ -254,18 +266,52 @@ const REV = [1, 7, 30]; // revisões espaçadas: 1, 7 e 30 dias depois
   el.style.webkitMaskImage = url; el.style.maskImage = url;
 })();
 
+/* ---------- flores: camada de fundo, raminho de canto e florzinha-marcador (versões clara e escura) ---------- */
+(function flores(){
+  const enc = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  const f = n => +n.toFixed(1);
+  const blossom = (x,y,r,c,m,rot=0) => { let p = ""; for (let k = 0; k < 5; k++) p += `<ellipse cx='${x}' cy='${f(y-r*.52)}' rx='${f(r*.4)}' ry='${f(r*.56)}' fill='${c}' transform='rotate(${k*72+rot} ${x} ${y})'/>`; return p + `<circle cx='${x}' cy='${y}' r='${f(r*.26)}' fill='${m}'/>`; };
+  const daisy = (x,y,r,c,m) => { let p = ""; for (let k = 0; k < 12; k++) p += `<ellipse cx='${x}' cy='${f(y-r*.55)}' rx='${f(r*.16)}' ry='${f(r*.45)}' fill='${c}' transform='rotate(${k*30} ${x} ${y})'/>`; return p + `<circle cx='${x}' cy='${y}' r='${f(r*.24)}' fill='${m}'/>`; };
+  const sprig = (x,y,len,ang,leaf,bud) => {
+    const a = ang*Math.PI/180, ex = f(x+Math.cos(a)*len), ey = f(y+Math.sin(a)*len), mx = f((x+ex)/2+Math.sin(a)*12), my = f((y+ey)/2-Math.cos(a)*12);
+    let g = `<path d='M${x} ${y}Q${mx} ${my} ${ex} ${ey}' stroke='${leaf}' stroke-width='1.6' fill='none' stroke-linecap='round'/>`;
+    [.28,.5,.72].forEach((t,i) => { const px = f((1-t)*(1-t)*x+2*(1-t)*t*mx+t*t*ex), py = f((1-t)*(1-t)*y+2*(1-t)*t*my+t*t*ey), s = i%2 ? 1 : -1;
+      g += `<ellipse cx='${px}' cy='${py}' rx='3.6' ry='8' fill='${leaf}' transform='rotate(${ang+90+s*45} ${px} ${py}) translate(0 -7)'/>`; });
+    return g + `<circle cx='${ex}' cy='${ey}' r='4.2' fill='${bud}'/>`;
+  };
+  const dots = (pts, c) => pts.map(([x,y,r]) => `<circle cx='${x}' cy='${y}' r='${r}' fill='${c}'/>`).join("");
+  const tile = P => `<svg xmlns='http://www.w3.org/2000/svg' width='380' height='380' viewBox='0 0 380 380'>`
+    + sprig(30,250,72,-40,P.leaf,P.peach) + sprig(300,140,60,160,P.leaf,P.rose) + sprig(150,370,50,-95,P.leaf,P.lav)
+    + blossom(70,80,22,P.rose,P.mid,8) + daisy(270,62,20,P.blush,P.mid) + blossom(190,178,16,P.lav,P.mid,24)
+    + blossom(322,252,24,P.peach,P.mid,-10) + daisy(108,318,16,P.coral,P.mid) + blossom(252,338,12,P.rose,P.mid,30)
+    + dots([[160,58,2.6],[172,66,1.8],[348,182,2.4],[40,168,2.2],[52,176,1.6],[214,262,2],[352,40,1.8]], P.dot) + `</svg>`;
+  const ramo = P => `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='150' viewBox='0 0 200 150'>`
+    + sprig(198,150,168,-148,P.leaf,P.rose) + sprig(198,150,132,-106,P.leaf,P.peach) + sprig(198,150,90,-170,P.leaf,P.lav)
+    + blossom(56,60,22,P.rose,P.mid,6) + blossom(160,28,16,P.peach,P.mid,-14) + daisy(112,96,13,P.blush,P.mid) + blossom(108,128,10,P.lav,P.mid,20)
+    + dots([[84,30,2.4],[30,96,2],[140,70,1.8]], P.dot) + `</svg>`;
+  const CLARO = { rose:"#f2a3ba", peach:"#f7bf9f", lav:"#d3bdee", blush:"#fbdde6", coral:"#ee98a9", mid:"#efc05c", leaf:"#a3c49b", dot:"#e9a0b6" };
+  const ESCURO = { rose:"#a9536f", peach:"#a8684f", lav:"#7a5d9c", blush:"#8e4a63", coral:"#9c4a5a", mid:"#d1a04a", leaf:"#4f7a58", dot:"#8a4560" };
+  const mask = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>${blossom(12,12.6,11,"#000","#000")}</svg>`;
+  const st = document.documentElement.style;
+  st.setProperty("--flores-claro", enc(tile(CLARO))); st.setProperty("--flores-escuro", enc(tile(ESCURO)));
+  st.setProperty("--ramo-claro", enc(ramo(CLARO))); st.setProperty("--ramo-escuro", enc(ramo(ESCURO)));
+  st.setProperty("--flor-mask", enc(mask));
+})();
+
 /* ---------- estado: vários cadernos (concurso, faculdade, estudos gerais) ---------- */
+const CORES_ANTIGAS = ["#c2457e","#7b4fa8","#e07a5f","#3a8f8a","#d4a017","#5b7fd6","#b5539c","#4f9a62","#d96f9b","#8a6bd1"];
+function recolorir(c){ (c.disciplinas || []).forEach(d => { const i = CORES_ANTIGAS.indexOf(d.cor); if (i >= 0) d.cor = CORES[i]; }); return c; }
 const VAZIO = () => ({ id:uid(), concurso:null, disciplinas:[], sessoes:[], dias:[1,2,3,4,5,6], minBloco:50 });
 const RAIZ = () => { const c = VAZIO(); return { v:2, atual:c.id, cadernos:[c] }; };
 function migrar(x){
   if (!x) return RAIZ();
   x = JSON.parse(JSON.stringify(x)); // cópia editável (snapshots do banco vêm congelados)
   if (x.v === 2 && Array.isArray(x.cadernos) && x.cadernos.length) {
-    x.cadernos = x.cadernos.map(c => Object.assign(VAZIO(), c));
+    x.cadernos = x.cadernos.map(c => recolorir(Object.assign(VAZIO(), c)));
     if (!x.cadernos.some(c => c.id === x.atual)) x.atual = x.cadernos[0].id;
     return x;
   }
-  const c = Object.assign(VAZIO(), x); delete c.v;
+  const c = recolorir(Object.assign(VAZIO(), x)); delete c.v;
   return { v:2, atual:c.id, cadernos:[c] };
 }
 let R = RAIZ(), S = R.cadernos[0];
@@ -483,7 +529,7 @@ function chart14(){
   if (metaDia) g += `<line x1="${L}" x2="${W-R}" y1="${y(metaDia)}" y2="${y(metaDia)}" stroke="var(--accent)" stroke-dasharray="4 4" opacity=".7"/><text x="${W-R}" y="${y(metaDia)-5}" text-anchor="end" font-size="11" fill="var(--accent)">meta/dia</text>`;
   v.forEach((m, i) => {
     const x = L + i*cw + cw*0.18, w = cw*0.64, isT = i === 13;
-    if (m > 0) g += `<rect x="${x}" y="${y(m)}" width="${w}" height="${T+h-y(m)}" rx="5" fill="${isT ? "var(--accent)" : "var(--plum)"}" opacity="${isT?1:.75}"><title>${fmtDate(dias[i])}: ${fmtH(m)}</title></rect>`;
+    if (m > 0) g += `<rect x="${x}" y="${y(m)}" width="${w}" height="${T+h-y(m)}" rx="5" fill="${isT ? "var(--accent)" : "var(--leaf)"}" opacity="${isT?1:.75}"><title>${fmtDate(dias[i])}: ${fmtH(m)}</title></rect>`;
     const dd = parse(dias[i]);
     g += `<text x="${x+w/2}" y="${H-12}" text-anchor="middle" font-size="10.5" fill="${isT?"var(--accent)":"var(--ink-soft)"}">${DIAS[dd.getDay()].slice(0,1)}${dd.getDate()}</text>`;
   });
@@ -504,7 +550,7 @@ function vDisciplinas(){
     ${S.disciplinas.map(d => {
       const p = pctTopicos(d);
       return `<div class="glass disc" data-disc="${d.id}">
-        <div class="disc-head"><span class="dot" style="background:${d.cor};width:12px;height:12px"></span><h3>${esc(d.nome)}</h3>
+        <div class="disc-head"><span class="dot" style="background:${d.cor};width:20px;height:20px"></span><h3>${esc(d.nome)}</h3>
           <span class="stars" aria-label="Domínio">${[1,2,3,4,5].map(n => `<button data-act="dom" data-id="${d.id}" data-n="${n}" class="${n<=d.dominio?"on":""}" aria-label="Domínio ${n} de 5">★</button>`).join("")}</span>
           <select data-act="peso" data-id="${d.id}" style="width:auto;padding:5px 8px;font-size:13px" aria-label="Peso">${[1,2,3].map(n=>`<option value="${n}" ${+d.peso===n?"selected":""}>peso ${n}</option>`).join("")}</select>
         </div>
