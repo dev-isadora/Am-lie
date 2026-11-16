@@ -221,6 +221,16 @@ details.more summary::-webkit-details-marker{display:none}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
 .chip:disabled{opacity:.45;cursor:not-allowed}
 .tnum{font-variant-numeric:tabular-nums}
+.cal{flex:none;width:48px;text-align:center;border:1px solid var(--hair);border-radius:10px;padding:5px 0 4px;line-height:1.05;background:var(--glass)}
+.cal b{display:block;font-family:var(--f-display);font-size:23px;font-weight:600}
+.cal i{display:block;font-style:normal;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.li.past{opacity:.5}
+.bul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;font-weight:300}
+.bul li::marker{color:var(--accent)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px 24px;margin-bottom:18px}
+.kv div span{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+.kv div b{font-weight:500;overflow-wrap:anywhere}
+.note{font-size:13px;font-weight:300;color:var(--ink-soft);border-left:2px solid var(--accent);padding:4px 0 4px 12px;margin:0 0 18px}
 </style>
 
 <div class="aura" aria-hidden="true"><i></i><i></i><i></i><i></i><div class="texture" id="texture"></div><div class="flores"></div></div>
@@ -244,6 +254,7 @@ details.more summary::-webkit-details-marker{display:none}
     <button role="tab" data-tab="disciplinas" aria-selected="false">Disciplinas</button>
     <button role="tab" data-tab="estudar" aria-selected="false">Registrar estudo</button>
     <button role="tab" data-tab="cronograma" aria-selected="false">Cronograma</button>
+    <button role="tab" data-tab="edital" aria-selected="false">Edital</button>
     <button role="tab" data-tab="mentora" aria-selected="false">Pergunte à Amélie</button>
     <button role="tab" data-tab="concurso" aria-selected="false">Meu objetivo</button>
   </nav>
@@ -378,6 +389,7 @@ async function initStore(){
   if (loc) { R = migrar(loc); usar(); }
   render();
   setSync(false, "Salvo neste navegador");
+  setTimeout(alertaInicial, 600);
   if (!window.claude || !window.claude.use) return;
   try {
     const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
@@ -390,11 +402,12 @@ async function initStore(){
     else if (loc) { save(); }
     else setSync(true, "Conectado à sua conta");
   } catch(e) { ref = ref || null; setSync(false, "Salvo neste navegador"); }
+  alertaInicial();
 }
 
 /* ---------- toast ---------- */
 let toastT;
-function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200); }
+function toast(msg, ms=2200){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), ms); }
 
 /* ---------- modelo INSS ---------- */
 function modeloINSS(){
@@ -480,7 +493,7 @@ function render(){
   $("#switch").innerHTML = `<select id="sel-caderno" data-act="caderno" aria-label="Caderno">${R.cadernos.map(k => `<option value="${k.id}" ${k.id===S.id?"selected":""}>${esc(nomeCaderno(k))}</option>`).join("")}</select><button class="btn sm" data-act="novo-caderno">+ Novo caderno</button>`;
   const app = $("#app");
   if (!c && tab !== "concurso") { app.innerHTML = vEmpty(); return; }
-  app.innerHTML = ({ painel:vPainel, disciplinas:vDisciplinas, estudar:vEstudar, cronograma:vCronograma, mentora:vMentora, concurso:vConcurso }[tab] || vPainel)();
+  app.innerHTML = ({ painel:vPainel, disciplinas:vDisciplinas, estudar:vEstudar, cronograma:vCronograma, edital:vEdital, mentora:vMentora, concurso:vConcurso }[tab] || vPainel)();
   if (tab === "mentora") restoreAI();
 }
 
@@ -516,6 +529,8 @@ function vPainel(){
     </div>
     ${dRest !== null ? `<div class="countdown"><div class="d">${dRest >= 0 ? dRest : 0}</div><div class="l">${dRest > 0 ? "dias até " + esc(c.marco || "a prova") : dRest === 0 ? "é hoje: " + esc(c.marco || "a prova") : "data-alvo já passou"}<br>${fmtDate(c.data)} de ${parse(c.data).getFullYear()}</div></div>` : `<div class="countdown"><div class="l">Sem data-alvo.<br><button class="btn sm ghost" data-act="goto" data-to="concurso">Definir data</button></div></div>`}
   </div>
+
+  ${avisosHTML()}
 
   <div class="grid g4">
     <div class="glass card stat"><div class="eyebrow">Esta semana</div><div class="num tnum">${fmtH(sem)}<small>de ${fmtH(meta)}</small></div><div class="meter"><i style="width:${meta?Math.min(100,sem/meta*100):0}%"></i></div><div class="hint">${meta && sem < meta ? "Faltam " + fmtH(meta - sem) + " para a meta" : meta ? "Meta da semana batida" : "Defina uma meta semanal"}</div></div>
@@ -682,7 +697,8 @@ Total estudado: ${fmtH(t.min)}. Edital coberto: ${Math.round(t.edital*100)}%. Ac
 Disciplinas:
 ${linhas||"(nenhuma)"}
 Últimas sessões:
-${rec||"(nenhuma)"}`;
+${rec||"(nenhuma)"}${S.edital ? `
+Edital (próximos prazos): ${avisosEdital().slice(0,6).map(a => a.evento + " " + a.quando).join("; ") || "nenhum"}${S.edital.dados.prova && S.edital.dados.prova.formato ? ". Formato da prova: " + S.edital.dados.prova.formato : ""}` : ""}`;
 }
 const PROMPTS = {
   analise: ["Análise do meu progresso", "Faça uma análise honesta do meu progresso: o que está indo bem, o que preocupa e as 3 ações mais importantes para os próximos dias."],
@@ -711,6 +727,219 @@ PEDIDO: ${pedido}`;
   }
   AI.busy = false; setBusy(sampleFn === null);
   const o = $("#ai-out"); if (o && AI.text) o.innerHTML = md(AI.text);
+}
+
+/* ---------- edital: leitura com a IA (ou leitura simples sem IA) e avisos de prazos ---------- */
+const EDK = () => "cda.edital." + S.id;
+function edTexto(){ try { return localStorage.getItem(EDK()) || ""; } catch(e){ return ""; } }
+function edSalvarTexto(t){ try { localStorage.setItem(EDK(), t); } catch(e){} }
+let edBusy = false, edMsg = "", edTimer = null, alertou = false;
+const isoOk = v => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : null;
+const fmtLong = v => parse(v).toLocaleDateString("pt-BR", { day:"2-digit", month:"short", year:"numeric" });
+const MESES = { janeiro:1, fevereiro:2, "março":3, marco:3, abril:4, maio:5, junho:6, julho:7, agosto:8, setembro:9, outubro:10, novembro:11, dezembro:12 };
+function updMsg(){ const m = $("#ed-msg"); if (m) m.textContent = edMsg; }
+
+function extrairLocal(t){
+  const linhas = t.split(/\n+/).flatMap(l => l.split(/(?<=[.;])\s+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ0-9])/)).map(x => x.replace(/\s+/g, " ").trim()).filter(Boolean);
+  const datas = [], valores = [], exig = [], vistos = new Set();
+  const reD = /(\d{1,2})\/(\d{1,2})\/(\d{2,4})|(\d{1,2})º? de (janeiro|fevereiro|março|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro) de (\d{4})/gi;
+  const curto = (l, n) => l.length > n ? l.slice(0, n-1) + "…" : l;
+  for (const l of linhas) {
+    let m; reD.lastIndex = 0;
+    while ((m = reD.exec(l))) {
+      let d, mo, y;
+      if (m[1]) { d = +m[1]; mo = +m[2]; y = +m[3]; if (y < 100) y += 2000; } else { d = +m[4]; mo = MESES[m[5].toLowerCase()]; y = +m[6]; }
+      if (!mo || mo > 12 || d < 1 || d > 31 || y < 2000 || y > 2100) continue;
+      const iso = y + "-" + pad(mo) + "-" + pad(d), ev = curto(l, 180);
+      if (!vistos.has(iso + ev)) { vistos.add(iso + ev); datas.push({ evento:ev, data:iso, fim:null, obs:"" }); }
+    }
+    if (vistos.has("L" + l)) continue; vistos.add("L" + l);
+    if (/R\$\s?\d/.test(l)) valores.push({ descricao:curto(l, 200), valor:(l.match(/R\$\s?[\d.]+(,\d{2})?/) || [""])[0] });
+    if (/(requisit|escolaridade|document|eliminad|vedad|proibid|caneta|identifica[çc][ãa]o|apresentar)/i.test(l) && l.length > 30 && l.length < 300) exig.push(l);
+  }
+  datas.sort((a, b) => a.data.localeCompare(b.data));
+  return { orgao:"", banca:"", resumo:"", cargos:[], valores:valores.slice(0, 30), datas:datas.slice(0, 60), prova:null, exigencias:exig.slice(0, 25), alertas:[], disciplinas:[] };
+}
+
+function normalizar(o){
+  o = o && typeof o === "object" ? o : {};
+  const arr = x => Array.isArray(x) ? x : [], str = x => (x == null || x === "null") ? "" : String(x);
+  return {
+    orgao:str(o.orgao), banca:str(o.banca), resumo:str(o.resumo),
+    cargos: arr(o.cargos).filter(c => c && c.nome).slice(0, 20).map(c => ({ nome:str(c.nome), vagas:str(c.vagas), remuneracao:str(c.remuneracao), escolaridade:str(c.escolaridade), requisitos:str(c.requisitos) })),
+    valores: arr(o.valores).filter(v => v && (v.descricao || v.valor)).slice(0, 30).map(v => ({ descricao:str(v.descricao), valor:str(v.valor) })),
+    datas: arr(o.datas).filter(d => d && isoOk(d.data)).map(d => ({ evento:str(d.evento), data:d.data, fim:isoOk(d.fim), obs:str(d.obs) })).sort((a, b) => a.data.localeCompare(b.data)).slice(0, 60),
+    prova: o.prova && typeof o.prova === "object" ? { data:isoOk(o.prova.data), horario:str(o.prova.horario), duracao:str(o.prova.duracao), formato:str(o.prova.formato) } : null,
+    exigencias: arr(o.exigencias).map(str).filter(Boolean).slice(0, 40),
+    alertas: arr(o.alertas).map(str).filter(Boolean).slice(0, 10),
+    disciplinas: []
+  };
+}
+function normDisc(list){
+  return (Array.isArray(list) ? list : []).filter(d => d && d.nome).slice(0, 25).map(d => ({
+    nome:String(d.nome).slice(0, 120), questoes:Number.isFinite(+d.questoes) && +d.questoes > 0 ? +d.questoes : null, peso:Number.isFinite(+d.peso) && +d.peso > 0 ? +d.peso : null,
+    topicos:(Array.isArray(d.topicos) ? d.topicos : []).filter(t => typeof t === "string" && t.trim()).slice(0, 40).map(t => t.trim().slice(0, 140))
+  }));
+}
+const P_INFO = cargo => `Você vai ler um edital de concurso público brasileiro e extrair as informações para uma candidata. Responda SOMENTE com um JSON neste formato:
+{"orgao":"","banca":"","resumo":"2 a 3 frases","cargos":[{"nome":"","vagas":"","remuneracao":"","escolaridade":"","requisitos":""}],"valores":[{"descricao":"Taxa de inscrição (nível médio)","valor":"R$ 85,00"}],"datas":[{"evento":"Inscrições","data":"AAAA-MM-DD","fim":"AAAA-MM-DD ou null","obs":""}],"prova":{"data":"AAAA-MM-DD ou null","horario":"","duracao":"","formato":""},"exigencias":[""],"alertas":[""]}
+Regras: use só o que está no texto e não invente; o que não existir fica null ou lista vazia. Datas sempre no formato AAAA-MM-DD; período vira "data" (início) e "fim". Em "datas" inclua todo o cronograma (inscrições, pedidos de isenção, pagamento, provas, gabaritos, recursos, resultados, títulos, TAF, perícia, posse se houver). Em "valores" coloque taxas, remuneração, auxílios. Em "prova.formato" descreva a prova (número de questões, tipo, discursiva, peso, nota mínima). Em "exigencias" liste, em frases curtas, as exigências da banca: requisitos do cargo, documentos, regras do dia da prova (horário dos portões, caneta, objetos proibidos, documento de identificação) e critérios de eliminação. Em "alertas" ponha até 8 pontos que a candidata não pode perder.${cargo ? " Cargo de interesse: " + cargo + "; dê prioridade a ele." : ""}
+
+EDITAL:
+`;
+const P_DISC = cargo => `Do edital abaixo, extraia as disciplinas da prova${cargo ? " para o cargo " + cargo : ""} e o conteúdo programático de cada uma. Responda SOMENTE com JSON: {"disciplinas":[{"nome":"","questoes":null,"peso":null,"topicos":["tópico curto"]}]}. "questoes" e "peso" são números quando o edital informar. Até 25 tópicos por disciplina, cada um com no máximo 90 caracteres, agrupando itens parecidos. Não invente.
+
+EDITAL:
+`;
+
+async function carregarPdfJs(){
+  if (window.pdfjsLib) return;
+  await new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+async function carregarArquivoEdital(file){
+  edMsg = "Abrindo " + file.name + "…"; updMsg();
+  try {
+    let texto = "";
+    if (/\.txt$/i.test(file.name) || file.type === "text/plain") texto = await file.text();
+    else {
+      await carregarPdfJs();
+      const pdf = await window.pdfjsLib.getDocument({ data:new Uint8Array(await file.arrayBuffer()) }).promise;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const c = await (await pdf.getPage(i)).getTextContent(); let y = null;
+        for (const it of c.items) { const ny = it.transform ? it.transform[5] : y; texto += (y !== null && Math.abs(ny - y) > 2) ? "\n" : " "; texto += it.str; y = ny; }
+        texto += "\n\n";
+        if (i % 5 === 0) { edMsg = `Lendo o PDF: página ${i} de ${pdf.numPages}`; updMsg(); }
+      }
+    }
+    if (texto.trim().length < 200) throw new Error("vazio");
+    edSalvarTexto(texto); edMsg = "Texto carregado. Agora toque em Analisar edital."; render();
+  } catch(e) {
+    edMsg = "Não consegui ler esse arquivo. Abra o PDF, selecione tudo (Ctrl+A), copie e cole o texto aqui."; updMsg();
+  }
+}
+
+async function analisarEdital(){
+  if (edBusy) return;
+  const raw = (($("#ed-txt") || {}).value || "").trim();
+  if (raw.length < 200) { edMsg = "O texto está muito curto. Cole o edital completo."; updMsg(); return; }
+  edSalvarTexto(raw);
+  const t = raw.replace(/[ \t ]+/g, " ").replace(/\n\s*\n\s*\n+/g, "\n\n");
+  edBusy = true; edMsg = "Lendo o edital…"; render();
+  if (sampleFn === undefined) sampleFn = (window.claude && window.claude.use) ? await claude.use("sample") : null;
+  let dados = null, fonte = "local", aviso = "";
+  if (sampleFn) {
+    const cargo = (S.concurso && S.concurso.cargo) || "", MAX = 150000;
+    let tInfo = t, tDisc = t;
+    if (t.length > MAX) {
+      const kw = /(\d{1,2}\/\d{1,2}\/\d{2,4}|R\$|inscri|isen|taxa|vaga|requisit|remunera|subs[ií]dio|escolar|cronograma|document|eliminad|recurso|resultado|port[õo]es|hor[áa]rio|caneta|identifica|prova|cargo|banca)/i;
+      tInfo = (t.slice(0, 20000) + "\n…\n" + t.slice(20000).split("\n").filter(l => kw.test(l)).join("\n")).slice(0, MAX);
+      const ini = t.search(/conte[uú]do program[aá]tico/i); tDisc = (ini >= 0 ? t.slice(ini) : t.slice(-MAX)).slice(0, MAX);
+    }
+    try {
+      edMsg = "Lendo datas, valores e exigências…"; updMsg();
+      dados = normalizar(await sampleFn.json(P_INFO(cargo) + tInfo, { cache:false })); fonte = "ia";
+      edMsg = "Lendo as disciplinas e o conteúdo…"; updMsg();
+      try { dados.disciplinas = normDisc(((await sampleFn.json(P_DISC(cargo) + tDisc, { cache:false })) || {}).disciplinas); }
+      catch(e) { aviso = "Não consegui ler o conteúdo programático desta vez. Toque em Analisar edital de novo para tentar."; }
+    } catch(e) {
+      if (e && e.code === "not_granted") sampleFn = null;
+      dados = null; aviso = "A IA não respondeu agora, então fiz uma leitura simples. Tente de novo em instantes para a leitura completa.";
+    }
+  }
+  if (!dados) dados = extrairLocal(t);
+  S.edital = { analisadoEm:today(), fonte, dados, aviso };
+  edBusy = false; edMsg = ""; save(); render(); toast("Edital analisado");
+}
+
+function importarDisciplinas(){
+  const ds = (S.edital && S.edital.dados.disciplinas) || []; let novas = 0, tops = 0;
+  const norm = x => String(x).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+  const maxQ = Math.max(1, ...ds.map(d => d.questoes || 0));
+  for (const e of ds) {
+    const peso = e.questoes ? Math.max(1, Math.min(3, Math.ceil(e.questoes / maxQ * 3))) : e.peso ? Math.max(1, Math.min(3, Math.round(e.peso))) : 2;
+    let d = S.disciplinas.find(x => norm(x.nome) === norm(e.nome));
+    if (!d) { d = { id:uid(), nome:e.nome, peso, questoes:e.questoes || 0, dominio:2, cor:CORES[S.disciplinas.length % CORES.length], topicos:[] }; S.disciplinas.push(d); novas++; }
+    else if (e.questoes) d.questoes = e.questoes;
+    for (const t of e.topicos) if (!d.topicos.some(x => norm(x.nome) === norm(t))) { d.topicos.push({ id:uid(), nome:t, feito:false, dataFeito:null, rev:0 }); tops++; }
+  }
+  save(); render();
+  toast(novas || tops ? `${novas} ${novas === 1 ? "disciplina nova" : "disciplinas novas"} e ${tops} ${tops === 1 ? "tópico" : "tópicos"} importados` : "Suas disciplinas já estavam iguais ao edital", 3200);
+}
+
+function avisosEdital(){
+  const ds = (S.edital && S.edital.dados.datas) || [], h = today(), out = [];
+  for (const d of ds) {
+    if (d.fim && d.data <= h && d.fim >= h) out.push(Object.assign({}, d, { quando:d.fim, estado:"agora", dias:diffDays(h, d.fim) }));
+    else if (d.data >= h) out.push(Object.assign({}, d, { quando:d.data, estado:"futuro", dias:diffDays(h, d.data) }));
+  }
+  return out.sort((a, b) => a.quando.localeCompare(b.quando));
+}
+function statusData(d){
+  const h = today();
+  if (d.fim && d.data <= h && d.fim >= h) { const n = diffDays(h, d.fim); return [n === 0 ? "termina hoje" : "aberto · termina em " + n + (n > 1 ? " dias" : " dia"), n <= 3 ? "bad" : "hot"]; }
+  if ((d.fim || d.data) < h) return ["encerrado", ""];
+  const n = diffDays(h, d.data); return [n === 0 ? "hoje" : n === 1 ? "amanhã" : "em " + n + " dias", n <= 3 ? "bad" : n <= 10 ? "warn" : ""];
+}
+function liData(d){
+  const [txt, cls] = statusData(d), dt = parse(d.data), passou = txt === "encerrado";
+  return `<div class="li${passou ? " past" : ""}"><div class="cal"><b>${dt.getDate()}</b><i>${dt.toLocaleDateString("pt-BR", { month:"short" }).replace(".", "")}</i></div><div class="t"><b>${esc(d.evento || "Data do edital")}</b><span>${fmtLong(d.data)}${d.fim ? " até " + fmtLong(d.fim) : ""}${d.obs ? " · " + esc(d.obs) : ""}</span></div><span class="pill ${cls}">${txt}</span></div>`;
+}
+function avisosHTML(){
+  if (!S.edital) return "";
+  const av = avisosEdital().slice(0, 4), dd = S.edital.dados;
+  return `<div class="glass card"><div class="row"><h2 style="margin:0">Avisos do edital</h2><span class="spacer"></span><button class="btn sm" data-act="goto" data-to="edital">Ver edital</button></div>
+    <p class="sub" style="margin-top:6px">Próximos prazos${dd.orgao ? " · " + esc(dd.orgao) : ""}${dd.banca ? " · " + esc(dd.banca) : ""}</p>
+    ${av.length ? `<div class="list">${av.map(liData).join("")}</div>` : `<p class="muted" style="margin:0">Nenhum prazo futuro no edital analisado.</p>`}</div>`;
+}
+function alertaInicial(){
+  if (alertou || !S.edital) return;
+  const a = avisosEdital().find(x => x.dias <= 3); if (!a) return;
+  alertou = true;
+  const quando = a.estado === "agora" ? (a.dias ? "termina em " + a.dias + (a.dias > 1 ? " dias" : " dia") : "termina hoje") : (a.dias === 0 ? "é hoje" : a.dias === 1 ? "é amanhã" : "em " + a.dias + " dias");
+  toast("Atenção: " + (a.evento.length > 70 ? a.evento.slice(0, 69) + "…" : a.evento) + " " + quando, 6000);
+}
+
+function vEdital(){
+  const e = S.edital, txt = edTexto();
+  return `<section class="view">
+  <div class="glass card"><h2>Edital</h2><p class="sub">Quando o edital sair, cole o texto aqui ou envie o PDF. A Amélie organiza o cronograma, os valores, as exigências da banca e o conteúdo da prova, e avisa no Painel quando cada prazo estiver chegando.</p>
+    <textarea id="ed-txt" aria-label="Texto do edital" style="min-height:190px" placeholder="Cole aqui o edital completo">${esc(txt)}</textarea>
+    <div class="row" style="margin-top:16px">
+      <button class="btn primary" data-act="ed-analisar" ${edBusy ? "disabled" : ""}>${edBusy ? "Analisando…" : e ? "Analisar de novo" : "Analisar edital"}</button>
+      <label class="btn" for="ed-file" style="cursor:pointer">Enviar PDF ou TXT</label><input type="file" id="ed-file" accept=".pdf,.txt,application/pdf,text/plain" hidden>
+      ${e ? `<button class="btn ghost danger" data-act="ed-apagar">Apagar análise</button>` : ""}
+    </div>
+    <p class="muted" id="ed-msg" style="font-size:13px;margin:12px 0 0">${esc(edMsg)}</p>
+  </div>
+  ${e ? vEditalDados(e) : ""}
+  </section>`;
+}
+function vEditalDados(e){
+  const dd = e.dados, pv = dd.prova;
+  const fonteTxt = e.fonte === "ia" ? "Lido pela Amélie em " + fmtLong(e.analisadoEm)
+    : "Leitura simples em " + fmtLong(e.analisadoEm) + ". Sem a IA, a Amélie só encontra datas, valores e frases com exigências. Para o cronograma organizado e as disciplinas, analise pelo link do Claude.";
+  const lista = xs => `<ul class="bul">${xs.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+  return `
+  <div class="glass card"><div class="eyebrow">Resumo</div><h2 style="margin-top:6px">${esc(dd.orgao || (S.concurso && S.concurso.nome) || "Edital")}</h2>
+    <p class="note">${esc(fonteTxt)}</p>${e.aviso ? `<p class="note">${esc(e.aviso)}</p>` : ""}
+    ${dd.resumo ? `<p style="margin:0 0 18px;font-weight:300;max-width:75ch">${esc(dd.resumo)}</p>` : ""}
+    <div class="kv">${dd.banca ? `<div><span>Banca</span><b>${esc(dd.banca)}</b></div>` : ""}${pv && pv.data ? `<div><span>Data da prova</span><b>${fmtLong(pv.data)}${pv.horario ? " · " + esc(pv.horario) : ""}</b></div>` : ""}${pv && pv.duracao ? `<div><span>Duração</span><b>${esc(pv.duracao)}</b></div>` : ""}</div>
+    ${pv && pv.formato ? `<p style="margin:0 0 16px;font-weight:300"><b style="font-weight:500">Formato da prova:</b> ${esc(pv.formato)}</p>` : ""}
+    ${pv && pv.data && S.concurso && S.concurso.data !== pv.data ? `<button class="btn sm" data-act="ed-usar-data">Usar esta data da prova no meu objetivo</button>` : ""}
+  </div>
+  ${dd.alertas.length ? `<div class="glass card"><h2>Pontos de atenção</h2><p class="sub">O que você não pode deixar passar</p>${lista(dd.alertas)}</div>` : ""}
+  <div class="grid g-3-2">
+    <div class="glass card"><h2>Cronograma</h2><p class="sub">${dd.datas.length} ${dd.datas.length === 1 ? "data encontrada" : "datas encontradas"}</p>${dd.datas.length ? `<div class="list">${dd.datas.map(liData).join("")}</div>` : `<p class="muted">Nenhuma data encontrada.</p>`}</div>
+    <div class="glass card"><h2>Valores e vagas</h2><p class="sub">Taxas, remuneração e cargos</p>
+      ${dd.valores.length ? `<div class="list">${dd.valores.map(v => `<div class="li"><div class="t"><b>${esc(v.valor || "")}</b><span>${esc(v.descricao)}</span></div></div>`).join("")}</div>` : `<p class="muted">Nenhum valor encontrado.</p>`}
+      ${dd.cargos.length ? `<div class="list" style="margin-top:10px">${dd.cargos.map(c => `<div class="li"><div class="t"><b>${esc(c.nome)}</b><span>${[c.vagas && "Vagas: " + c.vagas, c.remuneracao && "Remuneração: " + c.remuneracao, c.escolaridade, c.requisitos].filter(Boolean).map(esc).join(" · ")}</span></div></div>`).join("")}</div>` : ""}
+    </div>
+  </div>
+  ${dd.exigencias.length ? `<div class="glass card"><h2>Exigências da banca</h2><p class="sub">Requisitos, documentos, regras do dia da prova e critérios de eliminação</p>${lista(dd.exigencias)}</div>` : ""}
+  ${dd.disciplinas.length ? `<div class="glass card"><div class="row"><h2 style="margin:0">Conteúdo da prova</h2><span class="spacer"></span><button class="btn sm primary" data-act="ed-importar">Importar para minhas disciplinas</button></div>
+    <p class="sub" style="margin-top:6px">A importação cria as disciplinas que faltam e acrescenta os tópicos novos, sem apagar nada do que você já marcou.</p>
+    <div class="list">${dd.disciplinas.map(d => `<div class="li"><div class="t"><b>${esc(d.nome)}</b><span>${[d.questoes && d.questoes + " questões", d.peso && "peso " + d.peso, d.topicos.length + (d.topicos.length === 1 ? " tópico" : " tópicos")].filter(Boolean).join(" · ")}</span></div></div>`).join("")}</div></div>` : ""}`;
 }
 
 function vConcurso(){
@@ -753,6 +982,15 @@ document.querySelector("nav.tabs").addEventListener("click", e => {
 function go(t){ tab = t; try { localStorage.setItem("cda.tab", t); } catch(e){} render(); window.scrollTo({top:0,behavior:"smooth"}); }
 
 document.addEventListener("click", e => {
+  const be = e.target.closest("[data-act^='ed-']");
+  if (be) {
+    const a = be.dataset.act;
+    if (a === "ed-analisar") analisarEdital();
+    else if (a === "ed-importar") importarDisciplinas();
+    else if (a === "ed-usar-data") { const pv = S.edital.dados.prova; S.concurso.data = pv.data; S.concurso.marco = S.concurso.marco || "a prova"; if (!S.concurso.banca && S.edital.dados.banca) S.concurso.banca = S.edital.dados.banca; save(); render(); toast("Data da prova atualizada no seu objetivo"); }
+    else if (a === "ed-apagar") confirmTwice(be, "ed-apagar", "Confirmar", () => { S.edital = null; save(); render(); toast("Análise apagada"); });
+    return;
+  }
   const b = e.target.closest("[data-act]"); if (!b || b.tagName === "INPUT" || b.tagName === "SELECT") return;
   const a = b.dataset.act;
   if (a === "goto") go(b.dataset.to);
@@ -786,8 +1024,12 @@ document.addEventListener("click", e => {
   else if (a === "ai") { const p = PROMPTS[b.dataset.p]; askAI(p[0], p[1]); }
 });
 
+document.addEventListener("input", e => {
+  if (e.target.id === "ed-txt") { clearTimeout(edTimer); const v = e.target.value; edTimer = setTimeout(() => edSalvarTexto(v), 600); }
+});
 document.addEventListener("change", e => {
   const el = e.target;
+  if (el.id === "ed-file" && el.files && el.files[0]) { carregarArquivoEdital(el.files[0]); return; }
   if (el.id === "f-import" && el.files && el.files[0]) {
     el.files[0].text().then(txt => {
       const d = JSON.parse(txt);
